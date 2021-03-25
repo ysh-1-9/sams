@@ -26,7 +26,7 @@ class Seat:
         self.transactionID = None
 
 
-class Show:                                                 # keep separate balcony normal arrays if we can. add a construct from excel method
+class Show:  # keep separate balcony normal arrays if we can. add a construct from excel method
     def __init(self, starttime, endtime, name, nB, nN, priceB, priceN):
         self.startTime = starttime
         self.endTime = endtime
@@ -36,10 +36,10 @@ class Show:                                                 # keep separate balc
         self.seats = [Seat(x, 'Balcony' if x < nB else 'Normal') for x in
                       range(0, nB + nN)]  # seat numbers [0,nB-1] are balcony seats
 
-    def showAvailableSeats(self):
+    def showAvailableSeats(self):  # differs from SRS prototype
         return [x for x in self.seats if x.isAvailable()]
 
-    def percentageOccupied(self):                   #shorten this code
+    def percentageOccupied(self):  # shorten this code
         balconies = 0
         nB = 0
         normals = 0
@@ -54,7 +54,8 @@ class Show:                                                 # keep separate balc
                 if x.isAvailable():
                     normals += 1
 
-        return [balconies, nB, normals,nN]                                  # if we can diverge from srs prototypes, nahi toh calculate karke print kardo
+        return [balconies, nB, normals,
+                nN]  # if we can diverge from srs prototypes, nahi toh calculate karke print kardo
 
 
 class Auditorium:
@@ -66,7 +67,6 @@ class Auditorium:
 
     def findShow(self, name):
         return [x for x in self.shows if x.name is name]
-
 
 
 class Employee:
@@ -90,7 +90,7 @@ class SalesPerson(Employee):
         self.commissionRate = rate
         Employee.__init__(self, ID, passw)
 
-    # def getTransactions(self,ledgy):                              #redundant function?
+    # def getTransactions(self,ledgy):                              #redundant function? prototype differs from SRS
     #     ledgy.printTransactions(self.transactions)
 
     def addTransaction(self, ID):
@@ -105,33 +105,53 @@ class Transaction:
         self.date = date
 
     def print(self):
-        print("Transaction ID: ",self.transactionID)
+        print("Transaction ID: ", self.transactionID)
         print(self.name)
-        print("Amount (Credited): ",self.value)
-        print("Date: ",self.date)
+        print("Amount (Credited): ", self.value)
+        print("Date: ", self.date)
+
 
 class Ledger:
     def __init(self):
-        self.transactions = {}         #dictionary : transactionID -> transaction
+        self.transactions = {}  # dictionary : transactionID -> transaction
 
-    def printTransactions(self,transactionIDs):                          # return type differs from SRS prototype
+    def printTransactions(self, transactionIDs):  # return type differs from SRS prototype
         return [self.transactions[x] for x in transactionIDs]
         # for x in transactionIDs:
         #     self.transactions[x].print()
 
-    def addExpense(self,name,value,date):
-        self.transactions[name] = Transaction(value,len(self.transactions),name,date)
+    def addExpense(self, name, value, date):  # prototype differs from SRS
+        self.transactions[name] = Transaction(value, len(self.transactions), name, date)
 
 
 class ManagementSystem:
     def __init__(self):
+        self.auditoriums = Auditorium()  # SRS says auditorium array
+        self.ledger = Ledger()
+        self.employees = []
 
+    def read(self, ledgerfile, loginfile, auditoriumfile):  # method not in SRS
+        pass  # TBD
 
+    def login(self, ID, passw):  # prototype differs from SRS
+        for emp in self.employees:
+            if emp.loginID is ID and emp.password is passw:
+                return True
 
+    def ShowManagerMenu(self):
+        pass  # TBD
 
+    def SalesPersonMenu(self):
+        pass  # TBD
 
+    def AuditClerkMenu(self):
+        pass  # TBD
 
+    def SpectatorMenu(self):  # differs from SRS
+        pass  # TBD
 
+# write save methods for shows, auditoriums, ledgers, employees. maybe add a filename field everywhere so you know
+# where to save.
 
 # Press the green button in the gutter to run the script.
 
