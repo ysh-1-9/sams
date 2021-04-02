@@ -1,16 +1,10 @@
-#pupupu
-# This is a sample Python script.
-
-# Press ⌃R to execute it or replace it with your code.
-# Press Double ⇧ to search everywhere for classes, files, tool windows, actions, and settings.
-
-
 class Seat:
     def __init__(self, seatnumber, seattype):
         self.seatNumber = seatnumber
         self.seatType = seattype
         self.transactionID = None
         self.allotmentStatus = False
+
 
     def allot(self, ID):
         self.allotmentStatus = True
@@ -28,7 +22,7 @@ class Seat:
 
 
 class Show:  # keep separate balcony normal arrays if we can. add a construct from excel method
-    def __init(self, starttime, endtime, name, nB, nN, priceB, priceN):
+    def __init(self, starttime, endtime, name, nB, nN, priceB, priceN,audiNum):
         self.startTime = starttime
         self.endTime = endtime
         self.name = name
@@ -36,6 +30,8 @@ class Show:  # keep separate balcony normal arrays if we can. add a construct fr
         self.priceNormal = priceN
         self.seats = [Seat(x, 'Balcony' if x < nB else 'Normal') for x in
                       range(0, nB + nN)]  # seat numbers [0,nB-1] are balcony seats
+        self.audino = audiNum
+        #create sheet
 
     def showAvailableSeats(self):  # differs from SRS prototype
         return [x for x in self.seats if x.isAvailable()]
@@ -46,7 +42,7 @@ class Show:  # keep separate balcony normal arrays if we can. add a construct fr
         normals = 0
         nN = 0
         for x in self.seats:
-            if x.seatType is 'Balcony':
+            if x.seatType == 'Balcony':
                 nB += 1
                 if x.isAvailable():
                     balconies += 1
@@ -62,9 +58,11 @@ class Show:  # keep separate balcony normal arrays if we can. add a construct fr
 class Auditorium:
     def __init__(self):
         self.shows = []
+        #read excel file & create shows list
 
     def addshow(self, show):
         self.shows.append(show)
+        #update shows list
 
     def findShow(self, name):
         return [x for x in self.shows if x.name is name]
@@ -90,12 +88,15 @@ class SalesPerson(Employee):
         self.commission = 0
         self.commissionRate = rate
         Employee.__init__(self, ID, passw)
-
+        #create file
+        #self.df = pd.dataframe("hdkf.csv")
     # def getTransactions(self,ledgy):                              #redundant function? prototype differs from SRS
     #     ledgy.printTransactions(self.transactions)
 
-    def addTransaction(self, ID):
+    def insertTransaction(self, ID):
         self.transactions.append(ID)
+        #update excel file
+
 
 
 class Transaction:
@@ -104,6 +105,7 @@ class Transaction:
         self.transactionID = ID
         self.name = name
         self.date = date
+        #update excel file
 
     def print(self):
         print("Transaction ID: ", self.transactionID)
@@ -115,6 +117,9 @@ class Transaction:
 class Ledger:
     def __init(self):
         self.transactions = {}  # dictionary : transactionID -> transaction
+        self.showRevenue = {} #time adn audiNo as keys
+        #name and revenue generated as values
+        #read excel file + initialize trassactions dictionary
 
     def printTransactions(self, transactionIDs):  # return type differs from SRS prototype
         return [self.transactions[x] for x in transactionIDs]
@@ -123,27 +128,39 @@ class Ledger:
 
     def addExpense(self, name, value, date):  # prototype differs from SRS
         self.transactions[name] = Transaction(value, len(self.transactions), name, date)
-
+        #update excel file
 
 class ManagementSystem:
     def __init__(self):
         self.auditoriums = Auditorium()  # SRS says auditorium array
         self.ledger = Ledger()
         self.employees = []
-
-    def read(self, ledgerfile, loginfile, auditoriumfile):  # method not in SRS
-        pass  # TBD
+        #read excel file + initialize employee array
+    '''def read(self, ledgerfile, loginfile, auditoriumfile):  # method not in SRS
+        pass  # TBD'''
 
     def login(self, ID, passw):  # prototype differs from SRS
         for emp in self.employees:
             if emp.loginID is ID and emp.password is passw:
                 return True
+        #read excel file
+
 
     def ShowManagerMenu(self):
         pass  # TBD
+        #to create employees with id and password
+        #username must be unique
+        #update excel file
+        #add shows
+        '''//starttime<end time
+//audi should be empty
+//no duplicates
+//audi number should be valid'''
+
 
     def SalesPersonMenu(self):
         pass  # TBD
+    #book-> update seat allotment excel files for the particular show
 
     def AuditClerkMenu(self):
         pass  # TBD
@@ -155,6 +172,3 @@ class ManagementSystem:
 # where to save.
 
 # Press the green button in the gutter to run the script.
-
-
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
