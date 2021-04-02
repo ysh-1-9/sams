@@ -1,3 +1,11 @@
+#pupupu
+#monal trying to make changes to ysh/sams/master/main.py
+# This is a sample Python script.
+
+# Press ⌃R to execute it or replace it with your code.
+# Press Double ⇧ to search everywhere for classes, files, tool windows, actions, and settings.
+
+
 class Seat:
     def __init__(self, seatnumber, seattype):
         self.seatNumber = seatnumber
