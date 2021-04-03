@@ -5,7 +5,7 @@
 # Press ⌃R to execute it or replace it with your code.
 # Press Double ⇧ to search everywhere for classes, files, tool windows, actions, and settings.
 
-
+from tkinter import *
 class Seat:
     def __init__(self, seatnumber, seattype):
         self.seatNumber = seatnumber
@@ -147,6 +147,14 @@ class ManagementSystem:
     '''def read(self, ledgerfile, loginfile, auditoriumfile):  # method not in SRS
         pass  # TBD'''
 
+    def createshow(self, frem, name, audiN, start, end, nBalcony, nNormal, priceBalc, priceNormal):
+        # create a new window saying create hua ya nahi
+        frem.destroy()
+
+    def createSP(self, frem, loginID, password, rate):
+        # create a new window saying create hua ya nahi
+        frem.destroy()
+
     def login(self, ID, passw):  # prototype differs from SRS
         for emp in self.employees:
             if emp.loginID is ID and emp.password is passw:
@@ -155,7 +163,137 @@ class ManagementSystem:
 
 
     def ShowManagerMenu(self):
-        pass  # TBD
+        root = Tk()
+
+        canvas = Canvas(root, height=300, width=750)
+        canvas.pack()
+
+        frame = Frame(root, bg="#ffd6d6")
+        frame.place(relwidth=1, relheight=1)
+
+
+
+        def createshowUI():
+            newframe = Frame(root, bg="#ffd6d6")
+            newframe.place(relwidth=1, relheight=1)
+
+            label1 = Label(newframe, text="Name:", bg="#ffd6d6")
+            label1.place(relx=0.05, rely=0.14, relwidth=0.15, relheight=0.12)
+
+            entry1 = Entry(newframe)
+            entry1.place(relx=0.25, rely=0.14, relwidth=0.2, relheight=0.12)
+
+            label2 = Label(newframe, text="Auditorium Number:", bg="#ffd6d6")
+            label2.place(relx=0.5, rely=0.14, relwidth=0.2, relheight=0.12)
+
+            entry2 = Entry(newframe)
+            entry2.place(relx=0.75, rely=0.14, relwidth=0.2, relheight=0.12)
+
+            label3 = Label(newframe, text="Start Time:", bg="#ffd6d6")
+            label3.place(relx=0.05, rely=0.30, relwidth=0.15, relheight=0.12)
+
+            entry3 = Entry(newframe)
+            entry3.place(relx=0.25, rely=0.30, relwidth=0.2, relheight=0.12)
+
+            label4 = Label(newframe, text="End Time:", bg="#ffd6d6")
+            label4.place(relx=0.55, rely=0.30, relwidth=0.15, relheight=0.12)
+
+            entry4 = Entry(newframe)
+            entry4.place(relx=0.75, rely=0.30, relwidth=0.2, relheight=0.12)
+
+            label5 = Label(newframe, text="Balcony Seats:", bg="#ffd6d6")
+            label5.place(relx=0.05, rely=0.46, relwidth=0.15, relheight=0.12)
+
+            entry5 = Entry(newframe)
+            entry5.place(relx=0.25, rely=0.46, relwidth=0.2, relheight=0.12)
+
+            label6 = Label(newframe, text="Normal Seats:", bg="#ffd6d6")
+            label6.place(relx=0.55, rely=0.46, relwidth=0.15, relheight=0.12)
+
+            entry6 = Entry(newframe)
+            entry6.place(relx=0.75, rely=0.46, relwidth=0.2, relheight=0.12)
+
+            label7 = Label(newframe, text="Price Balcony:", bg="#ffd6d6")
+            label7.place(relx=0.05, rely=0.66, relwidth=0.15, relheight=0.12)
+
+            entry7 = Entry(newframe)
+            entry7.place(relx=0.25, rely=0.66, relwidth=0.2, relheight=0.12)
+
+            label8 = Label(newframe, text="Price Normal:", bg="#ffd6d6")
+            label8.place(relx=0.55, rely=0.66, relwidth=0.15, relheight=0.12)
+
+            entry8 = Entry(newframe)
+            entry8.place(relx=0.75, rely=0.66, relwidth=0.2, relheight=0.12)
+
+            button1 = Button(newframe, text="Create", command=lambda: self.createshow(newframe, entry1.get(),entry2.get(), entry3.get(), entry4.get(), entry5.get(), entry6.get(), entry7.get(), entry8.get()))
+            button1.place(relx = 0.45, relwidth = 0.1, rely = 0.86, relheight=0.1)
+
+            button6 = Button(newframe, text="Go Back", command=newframe.destroy)
+            button6.place(relx=0.05, relwidth=0.075, rely=0.05, relheight=0.1)
+
+
+
+
+        def createSPUI():
+            newframe = Frame(root, bg="#ffd6d6")
+            newframe.place(relwidth=1, relheight=1)
+
+            label1 = Label(newframe, text="Login ID:", bg="#ffd6d6")
+            label1.place(relx=0.05, rely=0.235, relwidth=0.425, relheight=0.12)
+
+            entry1 = Entry(newframe)
+            entry1.place(relx=0.525, rely=0.235, relwidth=0.425, relheight=0.12)
+
+            label2 = Label(newframe, text="Password:", bg="#ffd6d6")
+            label2.place(relx=0.05, rely=0.44, relwidth=0.425, relheight=0.12)
+
+            entry2 = Entry(newframe)
+            entry2.place(relx=0.525, rely=0.44, relwidth=0.425, relheight=0.12)
+
+            label3 = Label(newframe, text="Commission Rate:", bg="#ffd6d6")
+            label3.place(relx=0.05, rely=0.645, relwidth=0.425, relheight=0.12)
+
+            entry3 = Entry(newframe)
+            entry3.place(relx=0.525, rely=0.645, relwidth=0.425, relheight=0.12)
+
+
+            button6 = Button(newframe, text="Go Back", command=newframe.destroy)
+            button6.place(relx=0.05, relwidth=0.075, rely=0.05, relheight=0.1)
+
+            button1 = Button(newframe, text = "Create", command = lambda: self.createSP(newframe,entry1.get(), entry2.get(), entry3.get() ))
+            button1.place(relx=0.45, relwidth=0.1, rely=0.85, relheight=0.1)
+
+
+        def schedule():
+            pass
+
+        def transactionHistory():
+            pass
+
+        def balanceSheet():
+            pass
+
+        button1 = Button(frame, text="Create a Show", command=createshowUI)
+        button1.place(relx=0.05, rely=0.2, relwidth=0.425, relheight=0.2)
+
+        button2 = Button(frame, text="Create a Sales Person Account", command=createSPUI)
+        button2.place(relx=0.525, rely=0.2, relwidth=0.425, relheight=0.2)
+
+        button3 = Button(frame, text="View Auditorium Schedule", command=schedule)
+        button3.place(relx=0.05, relwidth=0.425, rely=0.45, relheight=0.2)
+
+        button4 = Button(frame, text="View Sales Person Transaction History", command=transactionHistory)
+        button4.place(relx=0.525, relwidth=0.425, rely=0.45, relheight=0.2)
+
+        button5 = Button(frame, text="View Balance Sheet", command=balanceSheet)
+        button5.place(relx=0.2875, relwidth=0.425, rely=0.7, relheight=0.2)
+
+        button6 = Button(frame, text="Logout", command=root.destroy)
+        button6.place(relx=0.05, relwidth=0.075, rely=0.05, relheight=0.1)
+
+        root.mainloop()
+
+
         #to create employees with id and password
         #username must be unique
         #update excel file
@@ -175,6 +313,12 @@ class ManagementSystem:
 
     def SpectatorMenu(self):  # differs from SRS
         pass  # TBD
+
+
+
+sys = ManagementSystem()
+
+sys.ShowManagerMenu()
 
 # write save methods for shows, auditoriums, ledgers, employees. maybe add a filename field everywhere so you know
 # where to save.
