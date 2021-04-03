@@ -393,7 +393,141 @@ class ManagementSystem:
 //audi number should be valid'''
 
     def SalesPersonMenu(self):
-        pass  # TBD
+        sproot = Tk()
+
+        #canvas = Canvas(sproot, height=300, width=750)
+        #canvas.pack()
+        spframe = Frame(sproot, bg="#009933")
+        spframe.place(relwidth=1, relheight=0.3)
+        sproot.title("Welcome Salesperson")
+
+        def spsearch_entry():
+           e = (sptosearch.get())
+           print(e)        
+         
+           spframe2 = Frame(sproot, bg = "#009933")
+           spframe2.place(relwidth = 1, relheight = 0.7, rely = 0.3)
+           
+           #for i in showslistsp:        #get from excel
+           #    ff
+                    
+           #spshows = ('Java', 'C#', 'C', 'C++', 'Python', 'Go', 'JavaScript', 'PHP', 'Swift', 'Java', 'C#', 'C', 'C++', 'Python', 'Go', 'JavaScript', 'PHP', 'Swift', 'Java', 'C#', 'C', 'C++', 'Python', 'Go', 'JavaScript', 'PHP', 'Swift')  get from excel
+           spshowslist = StringVar(value=spshows)
+
+           splistbox = Listbox(spframe2, listvariable = spshowslist,  selectmode = 'extended', font = 'Garamond', activestyle = 'dotbox', bd = 5, relief = 'raised')
+           splistbox.place(relx = 0.05, rely = 0.05, relheight = 0.85, relwidth = 0.9)
+
+           
+           spvscrollbar = Scrollbar(sproot)
+           spvscrollbar.pack(side = RIGHT, fill = Y)
+
+           sphscrollbar = Scrollbar(sproot, orient = HORIZONTAL)
+           sphscrollbar.pack(side = BOTTOM, fill = X)
+
+           splistbox.config(yscrollcommand = spvscrollbar.set, xscrollcommand = sphscrollbar.set)
+           spvscrollbar.config(command = splistbox.yview)
+           sphscrollbar.config(command = splistbox.xview)
+
+           def spselected_item(event):
+               value=str((splistbox.get(ANCHOR)))
+               print (value)
+
+               spframe3 = Frame(sproot, bg = "#009933")
+               spframe3.place(relheight = 1, relwidth = 1)
+               showname = showtiming = showauditorium = showdate = "abcd" #get from excel
+               Label(spframe3, text = ("Show: " + showname + "\nDate: " + showdate+ "\nTiming: " + showtiming + "\nAuditorium number:" + showauditorium), bg = "#009933", font = ("Garamond", 12)).pack(padx = 5, pady = 5)
+               
+               def showseats(noofseats, num):
+                   spcanvas = Canvas(sproot)
+                   spcanvas.place(relx = 0.03, rely = 0.35, relheight = 0.6, relwidth = 0.94 )
+                   x = 0.02
+                   y = 0.02
+                   statusnormal = ['booked', 'booked', 'booked', 'unbooked','unbooked', 'booked','unbooked', 'unbooked', 'booked', 'unbooked', 'booked', 'unbooked', 'unbooked', 'booked', 'booked', 'booked', 'booked', 'booked', 'unbooked', 'unbooked', 'booked', 'booked', 'booked', 'unbooked','unbooked', 'booked','unbooked', 'unbooked', 'booked', 'unbooked', 'booked', 'unbooked', 'unbooked', 'booked', 'booked', 'booked', 'booked', 'booked', 'unbooked', 'unbooked', 'booked', 'booked', 'booked', 'unbooked','unbooked', 'booked','unbooked', 'unbooked', 'booked', 'unbooked', 'booked', 'unbooked', 'unbooked', 'booked', 'booked', 'booked', 'booked', 'booked', 'unbooked', 'unbooked', 'booked', 'booked', 'booked', 'unbooked','unbooked', 'booked','unbooked', 'unbooked', 'booked', 'unbooked', 'booked', 'unbooked', 'unbooked', 'booked', 'booked', 'booked', 'booked', 'booked', 'unbooked', 'unbooked', 'booked', 'booked', 'booked', 'unbooked','unbooked', 'booked','unbooked', 'unbooked', 'booked', 'unbooked', 'booked', 'unbooked', 'unbooked', 'booked', 'booked', 'booked', 'booked', 'booked', 'unbooked', 'unbooked'] #from excel
+                   statusbalcony = ['booked', 'booked', 'booked', 'unbooked','unbooked', 'booked','unbooked', 'unbooked', 'booked', 'unbooked', 'booked', 'unbooked', 'unbooked','unbooked', 'unbooked', 'booked', 'unbooked', 'booked', 'unbooked', 'unbooked'] #from excel
+                   
+                   if num == 0:
+                       status = statusnormal
+                       seattype = 'normal'
+                   else:
+                       status = statusbalcony
+                       seattype = 'balcony'
+
+                   for i in range(noofseats):
+                   #if available = green, booked = red                   
+                       if x >= 0.93:
+                           x = 0.02
+                           y = y + 0.12
+
+                       if status[i] == 'booked': 
+                           spbutton5 = Button(spcanvas, text = i+1 , bd = 5, bg = '#cc0000', command = partial(spbookseat, i, showname, showdate, showtiming, showauditorium, seattype, 0))
+                           spbutton5.place(relx = x, rely = y, relheight = 0.1, relwidth = 0.05)
+
+                       elif status[i] == 'unbooked':
+                           spbutton5 = Button(spcanvas, text = i+1 , bd = 5, bg = '#009933', command = partial(spbookseat, i, showname, showdate, showtiming, showauditorium, seattype, 1))
+                           spbutton5.place(relx = x, rely = y, relheight = 0.1, relwidth = 0.05)
+                   
+                       x = x + 0.07
+
+               no_of_normals = 100  #from excel
+               no_of_balcony = 20   #from excel
+               spbutton1 = Button(spframe3, text = 'Normal seats' , bd = 5, command = partial(showseats, no_of_normals, 0))
+               spbutton1.place(relx = 0.70, rely = 0.2, relheight = 0.1, relwidth = 0.12)
+
+               spbutton2 = Button(spframe3, text = 'Balcony seats' , bd = 5, command = partial(showseats, no_of_balcony, 1))
+               spbutton2.place(relx = 0.83, rely = 0.2, relheight = 0.1, relwidth = 0.12)
+
+               
+               def createseat(spframe4):
+                    #make transaction and all, create/ cancel seat 
+                    pass                  
+                    
+
+               def spbookseat(seatnumber, showname, showdate, showtiming, showaudi, seattype, num):
+                   spframe4 = Frame(sproot, bg = "#009933")
+                   spframe4.place(relheight = 1, relwidth = 1)
+
+                   spbutton6 = Button(spframe4, text = 'Back' , bd = 5, command = spframe4.destroy)
+                   spbutton6.place(relx = 0.03, rely = 0.05, relheight = 0.1, relwidth = 0.1)
+                   if num == 0:
+                       Label(spframe4, text =("Cancel seat number " + str(seatnumber + 1) + " for show " + showname), font = ("Garamond", 20), bg = "#009933").pack(padx = 25, pady = 100)
+                       spbutton7 = Button(spframe4, text = 'Confirm Cancellation' , bd = 5, command = partial(createseat, spframe4))
+                       spbutton7.place(relx = 0.4, rely = 0.4, relheight = 0.1, relwidth = 0.20)
+                   
+                   elif num ==1:
+                       Label(spframe4, text =("Book seat number " + str(seatnumber + 1) + " for show " + showname), font = ("Garamond", 20), bg = "#009933").pack(padx = 25, pady = 100)
+                       spbutton7 = Button(spframe4, text = 'Confirm Booking' , bd = 5, command = partial(createseat, spframe4))
+                       spbutton7.place(relx = 0.4, rely = 0.4, relheight = 0.1, relwidth = 0.15)
+                   
+               
+               def spdestroy():
+                   spframe3.destroy()
+                   spframe2.destroy()
+                   spvscrollbar.destroy()
+                   sphscrollbar.destroy()
+
+               spbutton3 = Button(spframe3, text = 'Back' , bd = 5, command = spdestroy)
+               spbutton3.place(relx = 0.03, rely = 0.05, relheight = 0.1, relwidth = 0.1)
+               #
+           splistbox.bind('<<ListboxSelect>>', spselected_item)
+
+           return
+       
+
+        sproot.configure(bg = "#009933")
+        sproot.geometry("800x400")
+
+        sptosearch = StringVar()
+
+        spentry1 = Entry(spframe, textvariable = sptosearch, bd =5, width = 100, font = ("Garamond"))
+        spentry1.place(relx=0.05, rely=0.5, relheight=0.3, relwidth=0.66)
+
+        spbutton1 = Button(spframe, text = 'Search', bd=5, command = spsearch_entry, font = ("Garamond"))
+        spbutton1.place(relx = 0.75, rely = 0.5, relheight = 0.3, relwidth = 0.2)
+
+        spbutton2 = Button(spframe, text = 'Logout' , bd = 5, command = sproot.destroy)
+        spbutton2.place(relx = 0.05, rely = 0.1, relheight = 0.3, relwidth = 0.1)
+        
+        sproot.mainloop()
 
     # book-> update seat allotment excel files for the particular show
 
