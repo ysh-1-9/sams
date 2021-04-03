@@ -31,16 +31,15 @@ class Seat:
 
 
 class Show:  # keep separate balcony normal arrays if we can. add a construct from excel method
-    def __init__(self, name, audiNum, starttime, endtime, nB, nN, priceB, priceN):
-        self.startTime = starttime
+    def __init(self, starttime, endtime, name, nB, nN, priceB, priceN):
+        self.startTime = starttime                                                      #DISPALY ERROR MESSSAGE IF START TIME> END TIME
         self.endTime = endtime
         self.name = name
-        self.priceBalcony = priceB
+        self.priceBalcony = priceB                                                      ##MUST BE VALID NUMBERS
         self.priceNormal = priceN
-        self.seats = [Seat(x, 'Balcony' if x < nB else 'Normal') for x in
+        self.seats = [Seat(x, 'Balcony' if x < nB else 'Normal') for x in                 #CHANGE TO BSEATS AND NSEATS
                       range(0, nB + nN)]  # seat numbers [0,nB-1] are balcony seats
-        self.audino = audiNum
-        # create sheet
+        #self.nseats =                                                                          #EDIT       
 
     def showAvailableSeats(self):  # differs from SRS prototype
         return [x for x in self.seats if x.isAvailable()]
@@ -60,8 +59,8 @@ class Show:  # keep separate balcony normal arrays if we can. add a construct fr
                 if x.isAvailable():
                     normals += 1
 
-        return [balconies, nB, normals,
-                nN]  # if we can diverge from srs prototypes, nahi toh calculate karke print kardo
+        return [balconies, nB, normals, nN]  # if we can diverge from srs prototypes, nahi toh calculate karke print kardo
+
 
 
 class Auditorium:
