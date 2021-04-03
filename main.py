@@ -31,7 +31,7 @@ class Seat:
 
 
 class Show:  # keep separate balcony normal arrays if we can. add a construct from excel method
-    def __init(self, starttime, endtime, name, nB, nN, priceB, priceN):
+    def __init(self, starttime, endtime,audiNum, name, nB, nN, priceB, priceN):
         self.startTime = starttime                                                      #DISPALY ERROR MESSSAGE IF START TIME> END TIME
         self.endTime = endtime
         self.name = name
@@ -40,6 +40,7 @@ class Show:  # keep separate balcony normal arrays if we can. add a construct fr
         self.seats = [Seat(x, 'Balcony' if x < nB else 'Normal') for x in                 #CHANGE TO BSEATS AND NSEATS
                       range(0, nB + nN)]  # seat numbers [0,nB-1] are balcony seats
         #self.nseats =                                                                          #EDIT       
+        self.audino = audiNum
 
     def showAvailableSeats(self):  # differs from SRS prototype
         return [x for x in self.seats if x.isAvailable()]
