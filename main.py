@@ -31,7 +31,7 @@ class Seat:
 
 
 class Show:  # keep separate balcony normal arrays if we can. add a construct from excel method
-    def __init(self, starttime, endtime,audiNum, name, nB, nN, priceB, priceN):
+    def __init__(self, starttime, endtime,audiNum, name, nB, nN, priceB, priceN):
         self.startTime = starttime                                                      #DISPALY ERROR MESSSAGE IF START TIME> END TIME
         self.endTime = endtime
         self.name = name
@@ -160,7 +160,6 @@ class ManagementSystem:
                 label.place(relx=0, rely=0, relheight=1, relwidth=1)
                 return
         self.auditoriums.addshow(show)
-        #save show to excel
         label = Label(newf, text="Show Added", bg="#ffd6d6")
         label.place(relx=0, rely=0, relheight=1, relwidth=1)
         return
