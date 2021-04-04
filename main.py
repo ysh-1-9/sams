@@ -95,7 +95,7 @@ class SalesPerson(Employee):
     def __init__(self, ID, passw, rate):
         self.transactions = []
         self.commission = 0
-        self.commissionRate = rate
+        self.rate = rate
         Employee.__init__(self, ID, passw)
         # create file
         # self.df = pd.dataframe("hdkf.csv")
@@ -136,7 +136,7 @@ class Ledger:
         #     self.transactions[x].print()
 
     def addExpense(self, name, value, date):  # prototype differs from SRS
-        self.transactions[name] = Transaction(value, len(self.transactions), name, date)
+        self.transactions[len(self.transactions)] = Transaction(value, len(self.transactions), name, date)
         return True
         # update excel file
 
@@ -146,7 +146,20 @@ class ManagementSystem:
         self.auditoriums = Auditorium()  # SRS says auditorium array
         self.ledger = Ledger()
         self.employees = []
-        # read excel file + initialize employee array
+        self.balanceSheet = {}       #[audino,starttime]->[name,value]
+        self.currentemployee=None
+
+    def save(self):
+        pass
+        #save to employees.csx    format:
+
+        #save to ledger.csv            format: ['ID','name','date','price']        name is a string of showname,audino,starttime, and is irrelevant mostly
+
+        #save to balancesheet.csv      format: [name, audino, starttime, value]
+
+        #save to shows.csv    format: [starttime, endtime, audiNum, name, nB, nN, priceB, priceN]
+
+        #save seats for each show to "avengers 3 Mon, Jan 1 2001 00:00".csv
 
     '''def read(self, ledgerfile, loginfile, auditoriumfile):  # method not in SRS
         pass  # TBD'''
@@ -164,6 +177,10 @@ class ManagementSystem:
             seat.cancel()
             value*=-1
             self.ledger.addExpense(show.name+show.audino+show.startTime.strftime("%c"),value, datetime.now())
+
+        self.currentemployee.transactions.append(ID)
+        self.currentemployee.commission += self.currentemployee.rate * value
+
         return [ID, value]
 
 
@@ -225,6 +242,7 @@ class ManagementSystem:
         def login(ID, passw):
             for emp in self.employees:
                 if emp.loginID == ID and emp.password == passw:
+                    self.currentemployee = emp
                     if isinstance(emp, SalesPerson):
                         self.SalesPersonMenu(root)
                         return
@@ -404,7 +422,7 @@ class ManagementSystem:
             def getHistory(event):
                 ID = str(listbox.get(listbox.curselection()))
                 for x in self.employees:
-                    if x.loginID is ID:
+                    if x.loginID == ID:
                         emp = x
                 newnewframe = Frame(root, bg="#ffd6d6")
                 newnewframe.place(relwidth=1, relheight=1)
@@ -416,7 +434,8 @@ class ManagementSystem:
                 for x in emp.transactions:
                     y = self.ledger.transactions[x]
                     translist.insert(translist.size() + 1,
-                                     y.ID + " " + y.name + " " + y.date.strftime("%c") + " " + y.price)
+                                     str(y.transactionID) + " " + y.name + " " + y.date.strftime("%c") + " " + str(y.value)
+                                     )
 
                 translist.place(relx=0.05, rely=0.2, relwidth=0.9, relheight=0.75)
 
