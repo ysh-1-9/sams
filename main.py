@@ -5,15 +5,21 @@
 # Press ⌃R to execute it or replace it with your code.
 # Press Double ⇧ to search everywhere for classes, files, tool windows, actions, and settings.
 
-from tkinter import *
 from datetime import datetime
-
+from tkinter import *
+from tkcalendar import DateEntry
+import csv
 class Seat:
     def __init__(self, seatnumber, seattype):
         self.seatNumber = seatnumber
         self.seatType = seattype
         self.transactionID = None
         self.allotmentStatus = False
+        '''data = [starttime, endtime, audiNum, name, nB, nN, priceB, priceN]
+        showsFile = open("Shows.csv", 'a+', newline ='')
+        with showsFile:
+            write = csv.writer(showsFile)
+            write.writerow(data)'''
 
     def allot(self, ID):
         self.allotmentStatus = True
@@ -31,15 +37,25 @@ class Seat:
 
 
 class Show:  # keep separate balcony normal arrays if we can. add a construct from excel method
-    def __init(self, starttime, endtime, name, nB, nN, priceB, priceN):
-        self.startTime = starttime                                                      #DISPALY ERROR MESSSAGE IF START TIME> END TIME
+    def __init__(self, starttime, endtime, audiNum, name, nB, nN, priceB, priceN):
+        self.startTime = starttime  # DISPALY ERROR MESSSAGE IF START TIME> END TIME
         self.endTime = endtime
         self.name = name
-        self.priceBalcony = priceB                                                      ##MUST BE VALID NUMBERS
+        self.priceBalcony = priceB  ##MUST BE VALID NUMBERS
         self.priceNormal = priceN
-        self.seats = [Seat(x, 'Balcony' if x < nB else 'Normal') for x in                 #CHANGE TO BSEATS AND NSEATS
-                      range(0, nB + nN)]  # seat numbers [0,nB-1] are balcony seats
-        #self.nseats =                                                                          #EDIT       
+        #self.seats = [Seat(x, 'Balcony' if x < nB else 'Normal') for x in  range(0, nB + nN)]  # seat numbers [0,nB-1] are balcony seats
+        # self.nseats =                                          # CHANGE TO BSEATS AND NSEATS                                #EDIT
+        self.audino = audiNum
+        data = [starttime, endtime, audiNum, name, nB, nN, priceB, priceN]
+        showsFile = open("Shows.csv", 'a+', newline ='')
+        with showsFile:
+            write = csv.writer(showsFile)
+            write.writerow(data)
+        fields = ['number','type','transactionId','status']
+        seatFile = self.name+"_"+ str(self.startTime)+".csv"
+        with open(seatFile,'w',newline='') as csvfile:
+            writer = csv.DictWriter(csvfile,fieldnames=fields)
+            writer.writeheader()   
 
     def showAvailableSeats(self):  # differs from SRS prototype
         return [x for x in self.seats if x.isAvailable()]
@@ -52,29 +68,38 @@ class Show:  # keep separate balcony normal arrays if we can. add a construct fr
         for x in self.seats:
             if x.seatType == 'Balcony':
                 nB += 1
-                if x.isAvailable():
+                if not x.isAvailable():
                     balconies += 1
             else:
                 nN += 1
-                if x.isAvailable():
+                if not x.isAvailable():
                     normals += 1
 
-        return [balconies, nB, normals, nN]  # if we can diverge from srs prototypes, nahi toh calculate karke print kardo
-
+        return 100*(balconies+normals)/float(nB+nN) # if we can diverge from srs prototypes, nahi toh calculate karke print kardo
 
 
 class Auditorium:
     def __init__(self):
         self.shows = []
         # read excel file & create shows list
+        fields = ['starttime', 'endtime', 'audiNum', 'name', 'numBalcony', 'numNormal', 'priceB', 'priceN']
+        showsList = "Shows.csv"
+        with open(showsList,'w',newline='') as csvfile:
+            writer = csv.DictWriter(csvfile,fieldnames=fields)
+            writer.writeheader()
 
     def addshow(self, show):
         self.shows.append(show)
-        # update shows list
+        # update shows excel file 
+        #shows constructor has this so no need
 
     def findShow(self, name):
         return [x for x in self.shows if x.name is name]
 
+A = Auditorium()
+
+'''t1 = Show(90,91,1,"test1",90,100,250,200)
+t2 = Show(93,94,1,"test2",90,100,250,200)'''
 
 class Employee:
     def __init__(self, ID, passw):
@@ -104,7 +129,8 @@ class SalesPerson(Employee):
 
     def insertTransaction(self, ID):
         self.transactions.append(ID)
-        # update excel file
+        # update excel file 
+        # #transaction constructor has this so no need
 
 
 class Transaction:
@@ -114,6 +140,13 @@ class Transaction:
         self.name = name
         self.date = date
         # update excel file
+        data = [ID,name,date,price]
+        transactionFile = open("alltransactions.csv", 'a+', newline ='')
+        with transactionFile:
+            write = csv.writer(transactionFile)
+            write.writerow(data)
+
+
 
     def print(self):
         print("Transaction ID: ", self.transactionID)
@@ -128,6 +161,13 @@ class Ledger:
         self.showRevenue = {}  # time adn audiNo as keys
         # name and revenue generated as values
         # read excel file + initialize trassactions dictionary
+        fields = ['ID','name','date','price']
+        transactionFile = "alltransactions.csv"
+        with open(transactionFile,'w',newline='') as csvfile:
+            #write = csv.writer(csvfile)
+            #write.writerow(fields)
+            writer = csv.DictWriter(csvfile,fieldnames=fields)
+            writer.writeheader()
 
     def printTransactions(self, transactionIDs):  # return type differs from SRS prototype
         return [self.transactions[x] for x in transactionIDs]
@@ -137,7 +177,11 @@ class Ledger:
     def addExpense(self, name, value, date):  # prototype differs from SRS
         self.transactions[name] = Transaction(value, len(self.transactions), name, date)
         # update excel file
+        
+'''L = Ledger()
 
+t1 = Transaction(40,1,"booking",90)
+t2 = Transaction(40,2,"booking",91)'''
 
 class ManagementSystem:
     def __init__(self):
@@ -150,24 +194,40 @@ class ManagementSystem:
         pass  # TBD'''
 
     def createshow(self, frame, name, audiN, start, end, nBalcony, nNormal, priceBalc, priceNormal):
-        newf = Frame(frame, bg = "#ffd6d6")
-        newf.place(relx = 0.05, rely = 0.14, relwidth = 0.9, relheight = 0.81)
-        show = Show(name,audiN,datetime.strptime(start, '%m/%d/%y %H:%M'),datetime.strptime(end, '%m/%d/%y %H:%M'),int(nBalcony),int(nNormal),int(priceBalc),int(priceNormal))
+
+        # 01/01/21 00:00
+
+        newf = Frame(frame, bg="#ffd6d6")
+        newf.place(relx=0.05, rely=0.14, relwidth=0.9, relheight=0.81)
+        show = Show(datetime.strptime(start, '%m/%d/%y %H:%M'), datetime.strptime(end, '%m/%d/%y %H:%M'), audiN, name,
+                    int(nBalcony), int(nNormal), int(priceBalc), int(priceNormal))
         for x in self.auditoriums.shows:
             if x.name is name and x.startTime is show.startTime and x.audino is audiN:
                 label = Label(newf, text="Show Exists Already", bg="#ffd6d6")
                 label.place(relx=0, rely=0, relheight=1, relwidth=1)
                 return
         self.auditoriums.addshow(show)
-        #save show to excel
         label = Label(newf, text="Show Added", bg="#ffd6d6")
         label.place(relx=0, rely=0, relheight=1, relwidth=1)
         return
 
-
     def createSP(self, frame, loginID, password, rate):
         # create a new window saying create hua ya nahi
-        frame.destroy()
+        sp = SalesPerson(loginID, password, rate)
+        newf = Frame(frame, bg="#ffd6d6")
+        newf.place(relx=0.05, rely=0.14, relwidth=0.9, relheight=0.81)
+
+        for x in self.employees:
+            if x.loginID is loginID:
+                label = Label(newf, text="Login ID taken. Please try again", bg="#ffd6d6")
+                label.place(relx=0, rely=0, relheight=1, relwidth=1)
+                return
+
+        self.employees.append(sp)
+        #save employee to excel
+        label = Label(newf, text="Account Created", bg="#ffd6d6")
+        label.place(relx=0, rely=0, relheight=1, relwidth=1)
+
 
     def login(self, ID, passw):  # prototype differs from SRS
         for emp in self.employees:
@@ -295,15 +355,53 @@ class ManagementSystem:
 
             def display(audi):
                 listbox = Listbox(box)
-
+                listbox.insert(1, "Name" + " " * 36 + "Start Time" + " " * 30 + "End Time"+" "*32+"Percentage occupied")
                 for x in self.auditoriums.shows:
                     if x.audino is audi:
-                        listbox.insert(listbox.size() + 1, x.name + " from " + x.startTime.strftime("%c") + " to " + x.endTime.strftime("%c"))
+                        listbox.insert(listbox.size() + 1,
+                                       x.name + " " * (40 - len(x.name)) + x.startTime.strftime("%c") + " " * (
+                                                   40 - len(x.startTime.strftime("%c"))) + x.endTime.strftime("%c")+ " "*(
+                                                   40 - len(x.endTime.strftime("%c"))) + str(x.percentageOccupied()))
 
                 listbox.place(relx=0, rely=0, relheight=1, relwidth=1)
 
         def transactionHistory():
-            pass
+            newframe = Frame(root, bg="#ffd6d6")
+            newframe.place(relwidth=1, relheight=1)
+
+            button6 = Button(newframe, text="Go Back", command=newframe.destroy)
+            button6.place(relx=0.05, relwidth=0.075, rely=0.05, relheight=0.1)
+
+            label1 = Label(newframe, text="Select Sales Person:", bg="#ffd6d6")
+            label1.place(relx=0.05, rely=0.2, relwidth=0.2, relheight=0.1)
+
+            listbox = Listbox(newframe)
+            for x in self.employees:
+                if isinstance(x,SalesPerson):
+                    listbox.insert(listbox.size()+1, str(x.loginID))
+            listbox.place(relx=0.05, rely=0.35, relwidth=0.9, relheight=0.6)
+
+            def getHistory(event):
+                ID = str(listbox.get(listbox.curselection()))
+                for x in self.employees:
+                    if x.loginID is ID:
+                        emp = x
+                newnewframe = Frame(root, bg="#ffd6d6")
+                newnewframe.place(relwidth=1, relheight=1)
+
+                button6 = Button(newnewframe, text="Go Back", command=newnewframe.destroy)
+                button6.place(relx=0.05, relwidth=0.075, rely=0.05, relheight=0.1)
+
+                translist = Listbox(newnewframe)
+                for x in emp.transactions:
+                    y = self.ledger.transactions[x]
+                    translist.insert(translist.size()+1, y.ID + " " + y.name + " " + y.date.strftime("%c") + " " + y.price)
+
+                translist.place(relx = 0.05, rely = 0.2, relwidth = 0.9, relheight = 0.75)
+
+
+            listbox.bind('<Double-1>', getHistory)
+
 
         def balanceSheet():
             pass
