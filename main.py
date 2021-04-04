@@ -548,11 +548,11 @@ class ManagementSystem:
                             y = y + 0.14
 
                         if status[i] == 'booked':
-                            spbutton5 = Button(spcanvas, text=i + 1, bd=5, bg='#cc0000', command =lambda: spbookseat(i, show, num))
+                            spbutton5 = Button(spcanvas, text=i + 1, bd=5, bg='#cc0000', command =partial(spbookseat,i, show, num))
                             spbutton5.place(relx=x, rely=y, relheight=0.12, relwidth=0.05)
 
                         elif status[i] == 'unbooked':
-                            spbutton5 = Button(spcanvas, text=i + 1, bd=5, bg='#009933', command =lambda: spbookseat(i, show, num))
+                            spbutton5 = Button(spcanvas, text=i + 1, bd=5, bg='#009933', command =partial(spbookseat, i, show, num))
                             spbutton5.place(relx=x, rely=y, relheight=0.12, relwidth=0.05)
 
                         x = x + 0.07
