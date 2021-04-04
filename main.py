@@ -278,17 +278,91 @@ class ManagementSystem:
             entry2 = Entry(newframe)
             entry2.place(relx=0.75, rely=0.14, relwidth=0.2, relheight=0.12)
 
-            label3 = Label(newframe, text="Start Time:", bg="#ffd6d6")
-            label3.place(relx=0.05, rely=0.30, relwidth=0.15, relheight=0.12)
+            def getsdt():
+                cal = Calendar(root, selectmode = 'day',
+                                          year = 2020, month = 5,
+                                                     day = 22)
+  
+                cal.place(relx = 0.05, rely = 0.43)
 
-            entry3 = Entry(newframe)
-            entry3.place(relx=0.25, rely=0.30, relwidth=0.2, relheight=0.12)
+                def grad_date():
+                   c = cal.get_date()
+                   print(c)
+                   cal.destroy()
 
-            label4 = Label(newframe, text="End Time:", bg="#ffd6d6")
-            label4.place(relx=0.55, rely=0.30, relwidth=0.15, relheight=0.12)
+                   options = ['00:00', '01:00', '02:00', '03:00', '04:00', '05:00', '06:00', '07:00', '08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00', '21:00', '22:00', '23:00']
+                   clicked = StringVar()
 
-            entry4 = Entry(newframe)
-            entry4.place(relx=0.75, rely=0.30, relwidth=0.2, relheight=0.12)
+                   clicked.set( "Select Time" )
+
+                   etime = ' time not selected'
+                   
+                   def gettime(v, c):
+                       v = str(v)
+                       print(v)
+                       drop.destroy()                       
+                       bb.destroy()
+                       labelst = Label(newframe, text= (c + " " + v), bg = "#ffd6d6")
+                       labelst.place(relx=0.25, rely=0.30, relwidth=0.2, relheight=0.12)
+
+                   drop = OptionMenu( root , clicked , *options, command = partial(gettime, c) )
+                   drop.place(relx = 0.25, rely = 0.30)
+
+                   
+
+
+                bb = Button(root, text = "Done",
+                                      command = grad_date)
+                bb.place(relx = 0.25, rely = 0.30)
+                          
+
+
+
+            buttonst = Button(newframe, text="Start Time:", command = getsdt)
+            buttonst.place(relx=0.05, rely=0.30, relwidth=0.15, relheight=0.12)
+
+            def getedt():
+                cal = Calendar(root, selectmode = 'day',
+                                          year = 2020, month = 5,
+                                                     day = 22)
+  
+                cal.place(relx = 0.55, rely = 0.43)
+
+                def grad_date():
+                   c = cal.get_date()
+                   print(c)
+                   cal.destroy()
+
+                   options = ['00:00', '01:00', '02:00', '03:00', '04:00', '05:00', '06:00', '07:00', '08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00', '21:00', '22:00', '23:00']
+                   clicked = StringVar()
+
+                   clicked.set( "Select Time" )
+
+                   etime = ' time not selected'
+                   
+                   def gettime(v, c):
+                       v = str(v)
+                       print(v)
+                       drop.destroy()                       
+                       bb.destroy()
+                       labelst = Label(newframe, text= (c + " " + v), bg = "#ffd6d6")
+                       labelst.place(relx=0.75, rely=0.30, relwidth=0.2, relheight=0.12)
+
+                   drop = OptionMenu( root , clicked , *options, command = partial(gettime, c) )
+                   drop.place(relx = 0.75, rely = 0.30)
+
+                   
+
+
+                bb = Button(root, text = "Done",
+                                      command = grad_date)
+                bb.place(relx = 0.75, rely = 0.30)
+                          
+
+
+
+            buttonet = Button(newframe, text="End Time:", command = getedt)
+            buttonet.place(relx=0.55, rely=0.30, relwidth=0.15, relheight=0.12)
 
             label5 = Label(newframe, text="Balcony Seats:", bg="#ffd6d6")
             label5.place(relx=0.05, rely=0.46, relwidth=0.15, relheight=0.12)
