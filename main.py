@@ -6,6 +6,7 @@
 # Press Double ⇧ to search everywhere for classes, files, tool windows, actions, and settings.
 
 from datetime import datetime
+from functools import partial
 from tkinter import *
 from tkcalendar import DateEntry
 
@@ -137,6 +138,7 @@ class Ledger:
 
     def addExpense(self, name, value, date):  # prototype differs from SRS
         self.transactions[name] = Transaction(value, len(self.transactions), name, date)
+        return True
         # update excel file
 
 
@@ -186,18 +188,67 @@ class ManagementSystem:
         label.place(relx=0, rely=0, relheight=1, relwidth=1)
 
 
-    def login(self, ID, passw):  # prototype differs from SRS
-        for emp in self.employees:
-            if emp.loginID is ID and emp.password is passw:
-                return True
-        # read excel file
+    def loginUI(self, root):  # prototype differs from SRS
 
-    def ShowManagerMenu(self):
+        frame = Frame(root, bg="#ffd6d6")
+        frame.place(relwidth=1, relheight=1)
+
+        button6 = Button(frame, text="Go Back", command=frame.destroy)
+        button6.place(relx=0.05, relwidth=0.075, rely=0.05, relheight=0.1)
+
+        label1 = Label(frame, text="Login ID:", bg="#ffd6d6")
+        label1.place(relx = 0.05, rely = 0.25, relwidth=0.2, relheight= 0.15)
+
+        entry1 = Entry(frame)
+        entry1.place(relx = 0.35, rely = 0.25, relwidth = 0.6, relheight = 0.15)
+
+        label2 = Label(frame, text="Password", bg="#ffd6d6")
+        label2.place(relx = 0.05, rely = 0.5, relwidth=0.2, relheight= 0.15)
+
+        entry2 = Entry(frame)
+        entry2.place(relx=0.35, rely=0.5, relwidth=0.6, relheight=0.15)
+
+        def login(ID, passw):
+            for emp in self.employees:
+                if emp.loginID is ID and emp.password is passw:
+                    if isinstance(emp, SalesPerson):
+                        self.SalesPersonMenu(root)
+                        return
+                    elif isinstance(emp, AuditClerk):
+                        self.AuditClerkMenu(root)
+                        return
+                    else:
+                        self.ShowManagerMenu(root)
+                        return
+
+            print("invalid login")
+
+
+        button1 = Button(frame, text = 'Login', command = lambda: login(str(entry1.get()), str(entry2.get())))
+        button1.place(relx = 0.45, rely = 0.75, relwidth = 0.1, relheight=0.15)
+
+
+
+
+    def homeUI(self):
         root = Tk()
 
         canvas = Canvas(root, height=300, width=750)
         canvas.pack()
 
+        frame = Frame(root, bg="#ffd6d6")
+        frame.place(relwidth=1, relheight=1)
+
+        button1 = Button(frame, text='Employee', command = lambda: self.loginUI(root))
+        button1.place(relx = 0.3, rely = 0.4, relwidth = 0.1, relheight = 0.2)
+
+        button2 = Button(frame, text = 'Spectator', command = lambda: self.SpectatorMenu(root))
+        button2.place(relx = 0.6, rely = 0.4, relwidth = 0.1, relheight = 0.2)
+
+        root.mainloop()
+
+    def ShowManagerMenu(self, root):
+        print('Show manager menu called')
         frame = Frame(root, bg="#ffd6d6")
         frame.place(relwidth=1, relheight=1)
 
@@ -361,7 +412,15 @@ class ManagementSystem:
 
 
         def balanceSheet():
-            pass
+            newframe = Frame(root, bg="#ffd6d6")
+            newframe.place(relwidth=1, relheight=1)
+
+            button6 = Button(newframe, text="Go Back", command=newframe.destroy)
+            button6.place(relx=0.05, relwidth=0.075, rely=0.05, relheight=0.1)
+
+            listbox = Listbox(newframe)
+            #insert things to listbox from self.balancesheet
+            listbox.place(relx = 0.05, relwidth = 0.9, rely = 0.2, relheight=0.75)
 
         button1 = Button(frame, text="Create a Show", command=createshowUI)
         button1.place(relx=0.05, rely=0.2, relwidth=0.425, relheight=0.2)
@@ -378,10 +437,9 @@ class ManagementSystem:
         button5 = Button(frame, text="View Balance Sheet", command=balanceSheet)
         button5.place(relx=0.2875, relwidth=0.425, rely=0.7, relheight=0.2)
 
-        button6 = Button(frame, text="Logout", command=root.destroy)
+        button6 = Button(frame, text="Logout", command=frame.destroy)
         button6.place(relx=0.05, relwidth=0.075, rely=0.05, relheight=0.1)
 
-        root.mainloop()
 
         # to create employees with id and password
         # username must be unique
@@ -392,8 +450,7 @@ class ManagementSystem:
 //no duplicates
 //audi number should be valid'''
 
-    def SalesPersonMenu(self):
-        sproot = Tk()
+    def SalesPersonMenu(self, sproot):
 
         #canvas = Canvas(sproot, height=300, width=750)
         #canvas.pack()
@@ -411,7 +468,7 @@ class ManagementSystem:
            #for i in showslistsp:        #get from excel
            #    ff
                     
-           #spshows = ('Java', 'C#', 'C', 'C++', 'Python', 'Go', 'JavaScript', 'PHP', 'Swift', 'Java', 'C#', 'C', 'C++', 'Python', 'Go', 'JavaScript', 'PHP', 'Swift', 'Java', 'C#', 'C', 'C++', 'Python', 'Go', 'JavaScript', 'PHP', 'Swift')  get from excel
+           spshows = ('Java', 'C#', 'C', 'C++', 'Python', 'Go', 'JavaScript', 'PHP', 'Swift', 'Java', 'C#', 'C', 'C++', 'Python', 'Go', 'JavaScript', 'PHP', 'Swift', 'Java', 'C#', 'C', 'C++', 'Python', 'Go', 'JavaScript', 'PHP', 'Swift')
            spshowslist = StringVar(value=spshows)
 
            splistbox = Listbox(spframe2, listvariable = spshowslist,  selectmode = 'extended', font = 'Garamond', activestyle = 'dotbox', bd = 5, relief = 'raised')
@@ -511,10 +568,7 @@ class ManagementSystem:
            splistbox.bind('<<ListboxSelect>>', spselected_item)
 
            return
-       
 
-        sproot.configure(bg = "#009933")
-        sproot.geometry("800x400")
 
         sptosearch = StringVar()
 
@@ -524,20 +578,54 @@ class ManagementSystem:
         spbutton1 = Button(spframe, text = 'Search', bd=5, command = spsearch_entry, font = ("Garamond"))
         spbutton1.place(relx = 0.75, rely = 0.5, relheight = 0.3, relwidth = 0.2)
 
-        spbutton2 = Button(spframe, text = 'Logout' , bd = 5, command = sproot.destroy)
+        spbutton2 = Button(spframe, text = 'Logout' , bd = 5, command = spframe.destroy)
         spbutton2.place(relx = 0.05, rely = 0.1, relheight = 0.3, relwidth = 0.1)
-        
-        sproot.mainloop()
+
 
     # book-> update seat allotment excel files for the particular show
 
-    def AuditClerkMenu(self):
-        pass  # TBD
+    def AuditClerkMenu(self, root):
 
-    def SpectatorMenu(self):  # differs from SRS
-        sproot = Tk()
-        spframe = Frame(sproot, bg="#009933")
-        spframe.place(relwidth=1, relheight=0.3)
+        frame = Frame(root, bg="#ffd6d6")
+        frame.place(relwidth=1, relheight=1)
+
+        button6 = Button(frame, text="Logout", command=frame.destroy)
+        button6.place(relx=0.05, relwidth=0.075, rely=0.05, relheight=0.1)
+
+        label1 = Label(frame, text="Enter expense name: ",bg="#ffd6d6")
+        label1.place(relx = 0.05, relwidth=0.425, rely = 0.24, relheight=0.1)
+
+        entry1 = Entry(frame)
+        entry1.place(relx = 0.525, relwidth=0.425, rely = 0.24, relheight=0.1)
+
+        label2 = Label(frame, text="Enter expense amount: ", bg="#ffd6d6")
+        label2.place(relx=0.05, relwidth=0.425, rely=0.43, relheight=0.1)
+
+        entry2 = Entry(frame)
+        entry2.place(relx=0.525, relwidth=0.425, rely=0.43, relheight=0.1)
+
+        label3 = Label(frame, text="Enter expense date: ", bg="#ffd6d6")
+        label3.place(relx=0.05, relwidth=0.425, rely=0.62, relheight=0.1)
+
+        entry3 = Entry(frame)
+        entry3.place(relx=0.525, relwidth=0.425, rely=0.62, relheight=0.1)
+
+        def save():
+            if self.ledger.addExpense(entry1.get(), entry2.get(), datetime.strptime(entry3.get(), '%m/%d/%y %H:%M')):
+                label4 = Label(frame, text=entry1.get()+ " Saved Successfully", bg="#ffd6d6")
+                label4.place(relx = 0.55, relwidth = 0.4, rely = 0.81, relheight = 0.1)
+            else:
+                label4 = Label(frame, text="Could not be saved", bg="#ffd6d6")
+                label4.place(relx=0.55, relwidth=0.4, rely=0.81, relheight=0.1)
+            #add same for balance sheet
+
+        button1 = Button(frame, text = "Save", command = save)
+        button1.place(relx = 0.05, relwidth = 0.1, rely = 0.81, relheight=0.1)
+
+
+    def SpectatorMenu(self, sproot):  # differs from SRS
+        spframe = Frame(sproot, bg="#ffd6d6")
+        spframe.place(relwidth=1, relheight=1)
         sproot.title("Welcome Spectator")
 
         def spsearch_entry():
@@ -630,28 +718,28 @@ class ManagementSystem:
            return
        
 
-        sproot.configure(bg = "#009933")
-        sproot.geometry("800x400")
-
         sptosearch = StringVar()
 
         spentry1 = Entry(spframe, textvariable = sptosearch, bd =5, width = 100, font = ("Garamond"))
-        spentry1.place(relx=0.05, rely=0.5, relheight=0.3, relwidth=0.66)
+        spentry1.place(relx=0.05, rely=0.5, relheight=0.1, relwidth=0.66)
 
         spbutton1 = Button(spframe, text = 'Search', bd=5, command = spsearch_entry, font = ("Garamond"))
-        spbutton1.place(relx = 0.75, rely = 0.5, relheight = 0.3, relwidth = 0.2)
+        spbutton1.place(relx = 0.75, rely = 0.5, relheight = 0.1, relwidth = 0.2)
 
-        spbutton2 = Button(spframe, text = 'Return' , bd = 5, command = sproot.destroy)
-        spbutton2.place(relx = 0.05, rely = 0.1, relheight = 0.3, relwidth = 0.1)
+        spbutton2 = Button(spframe, text = 'Go Back', command = spframe.destroy)
+        spbutton2.place(relx=0.05, relwidth=0.075, rely=0.05, relheight=0.1)
         
         sproot.mainloop()
 
 
-sys = ManagementSystem()
+def startup():
+    #read from excel files and shit
+    sys = ManagementSystem()
+    x = ShowManager('id','pass')
+    sys.employees.append(x)
+    sys.homeUI()
 
-sys.ShowManagerMenu()
-sys.SalesPersonMenu()
-sys.SpectatorMenu()
+startup()
 
 # write save methods for shows, auditoriums, ledgers, employees. maybe add a filename field everywhere so you know
 # where to save.
