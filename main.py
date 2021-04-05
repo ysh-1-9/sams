@@ -25,18 +25,26 @@ class Seat:
     def isAvailable(self):
         return not self.allotmentStatus
 
-    def print(self):
-        print("Seat Number: " + self.seatNumber + ", Seat Type: " + self.seatType)
+    # def print(self):
+    #     print("Seat Number: " + self.seatNumber + ", Seat Type: " + self.seatType)
 
     def cancel(self):
         self.allotmentStatus = False
         self.transactionID = None
 
 
+
+
+
 class Show:  # keep separate balcony normal arrays if we can. add a construct from excel method
     def __init__(self, starttime, endtime, audiNum, name, nB, nN, priceB, priceN):
-        self.startTime = starttime  # DISPALY ERROR MESSSAGE IF START TIME> END TIME
-        self.endTime = endtime
+        if(endtime<starttime):
+            # print("Time error")
+            self.startTime = None  # DISPALY ERROR MESSSAGE IF START TIME> END TIME
+            self.endTime = None
+        else:
+            self.startTime = starttime  # DISPALY ERROR MESSSAGE IF START TIME> END TIME
+            self.endTime = endtime
         self.name = name
         self.priceBalcony = priceB  ##MUST BE VALID NUMBERS
         self.priceNormal = priceN
@@ -45,7 +53,7 @@ class Show:  # keep separate balcony normal arrays if we can. add a construct fr
         self.audino = audiNum
 
     def showAvailableSeats(self):  # differs from SRS prototype
-        return [x for x in self.seats if x.isAvailable()]
+        return [x for x in self.bseats if x.isAvailable()],[x for x in self.nseats if x.isAvailable()]
 
     def percentageOccupied(self):  # shorten this code
         balconies = 0
@@ -70,7 +78,11 @@ class Auditorium:
         # read excel file & create shows list
 
     def addshow(self, show):
+        for x in self.shows:
+            if x.audino == show.audino and ((x.startTime >=show.startTime and x.startTime<=show.endTime) or (x.endTime>=show.startTime and x.endTime<=show.endTime) or (x.startTime<=show.startTime and x.endTime>=show.endTime)):
+                return False
         self.shows.append(show)
+        return True
         # update shows list
 
     def findShow(self, name):
@@ -131,6 +143,10 @@ class Ledger:
         # read excel file + initialize trassactions dictionary
 
     def printTransactions(self, transactionIDs):  # return type differs from SRS prototype
+        for x in transactionIDs:
+            if x not in self.transactions:
+                print("Transaction ID out of bounds error")
+                return False
         return [self.transactions[x] for x in transactionIDs]
         # for x in transactionIDs:
         #     self.transactions[x].print()
@@ -946,8 +962,183 @@ def startup():
     sys.employees.append(z)
     sys.homeUI()
 
+def unitTest():
 
-startup()
+    goodcount = 0
+    totalcount =0
+    print("Testing Seat")
+    x = Seat(12,'Balcony')
+    if x.seatNumber==12 and x.seatType=='Balcony':
+        print("+++ Seat init works")
+    else:
+        print("+++ Seat init doesnt work")
+
+    x.allot(100)
+    if x.transactionID == 100 and not x.isAvailable():
+        print('+++ Seat allot works 1/2')
+    else:
+        print('+++ Seat allot doesnt work 1/2')
+
+    if not x.allot(101):
+        print('+++ Seat allot works 2/2')
+    else:
+        print('+++ Seat allot doesnt work 2/2')
+
+    if not x.isAvailable():
+        print("+++ Seat isAvailable works")
+    else:
+        print("+++ Seat isAvailable doesnt work")
+
+    x.cancel()
+
+    if x.allotmentStatus is False and x.transactionID is None:
+        print("+++ Seat cancel works 1/2")
+    else:
+        print("+++ Seat cancel doesnt work 1/2")
+
+    if not x.cancel():
+        print("+++ Seat cancel works 2/2")
+    else:
+        print("+++ Seat cancel doesnt work 2/2")
+
+    print("Testing Show")
+
+    x = Show(datetime.strptime("01/01/01 00:00", '%m/%d/%y %H:%M'),datetime.strptime("01/01/01 01:00", '%m/%d/%y %H:%M'), 89,"TestShow",90,10,500,1000)
+
+    if x.name == "TestShow" and x.audino == 89 and x.priceBalcony ==500 and x.priceNormal == 1000 and len(x.nseats) == 10 and len(x.bseats) == 90:
+        print("+++ Show init works")
+    else:
+        print("+++ Show init doesnt work")
+
+    x = Show(datetime.strptime("01/01/01 02:00", '%m/%d/%y %H:%M'),datetime.strptime("01/01/01 01:00", '%m/%d/%y %H:%M'), 89,"TestShow",90,10,500,1000)
+    if x.startTime is None and x.endTime is None:
+        print("+++ Show init time exception works")
+    else:
+        print("+++ Show init time exception doesnt work")
+
+    for y in x.nseats:
+        y.allot(0)
+    z = x.showAvailableSeats()
+    if z[0] == x.bseats:
+        print("+++ Show showAvailableSeats works")
+    else:
+        print("+++ Show showAvailableSeats doesnt work")
+
+    if x.percentageOccupied() == 100*len(x.nseats)/float(len(x.nseats)+len(x.bseats)):
+        print("+++ Show percentage occupied works")
+    else:
+        print("++ Show percentage occupied doesnt work")
+        print (x.percentageOccupied())
+        print(100*len(x.nseats)/float(len(x.nseats)+len(x.bseats)))
+
+    print("Testing Auditorium")
+    audi = Auditorium()
+    x = Show(datetime.strptime("01/01/01 00:00", '%m/%d/%y %H:%M'),
+             datetime.strptime("01/01/01 01:00", '%m/%d/%y %H:%M'), 89, "TestShow", 90, 10, 500, 1000)
+    if audi.shows == []:
+        print("+++ Auditorium init works")
+    else:
+        print("+++ Auditorium init doesnt work")
+
+    testshow = x
+
+    if audi.addshow(testshow) and audi.shows[0] == testshow:
+        print("+++ Auditorium add show works 1/2")
+    else:
+        print("+++ Auditorium add show doesnt work 1/2")
+
+    if not audi.addshow(testshow):
+        print("+++ Auditorium add show works 2/2")
+    else:
+        print("+++ Auditorium add show doesnt work 2/2")
+
+    if audi.findShow('est') == [testshow]:
+        print("+++ Auditorium find show works")
+    else:
+        print("+++ Auditorium find show doesnt work")
+
+    print("Testing Transaction")
+
+    tran = Transaction(130,100,'booking',datetime.now())
+    if tran.transactionID == 100 and tran.name == 'booking' and tran.value==130:
+        print("+++ Transaction init works")
+    else:
+        print("+++ Transaction init doesnt work")
+
+    print("Testing Ledger")
+    ledgy = Ledger()
+
+    if not ledgy.transactions:
+        print("+++ Ledger init works")
+    else:
+        print("+++ Ledger init doesnt work")
+
+    ledgy.addExpense('Electricity',13000, datetime.now())
+
+    if ledgy.transactions[0].name == 'Electricity' and ledgy.transactions[0].value == 13000:
+        print("+++ Ledger add expense works")
+    else:
+        print("+++ Ledger add expense doesnt work")
+
+    if ledgy.printTransactions([0])[0].name == 'Electricity' and ledgy.printTransactions([0])[0].value == 13000:
+        print("+++ Ledger print transaction works 1/2")
+    else:
+        print("+++ Ledger print transaction doesnt work 1/2")
+
+    if not ledgy.printTransactions([4,5]):
+        print("+++ Ledger print transaction works 2/2")
+    else:
+        print("+++ Ledger print transaction doesnt work 2/2")
+
+
+    print("Testing Employee")
+
+    emp = Employee('id','pass1')
+
+    if emp.loginID == 'id' and emp.password == 'pass1':
+        print("+++ Employee init works")
+    else:
+        print("+++ Employee init doesnt work")
+
+    print("Testing Sales Person")
+
+    sp = SalesPerson('id','pass1','1000')
+
+    if sp.loginID == 'id' and sp.password == 'pass1':
+        print("+++ Sales Person init works")
+    else:
+        print("+++ Sales Person init doesnt work")
+
+    sp.insertTransaction(3)
+    if sp.transactions[0] ==3:
+        print("+++ Sales Person insert transaction works")
+    else:
+        print("+++ Sales Person insert transaction doesnt work")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+unitTest()
+
 
 # write save methods for shows, auditoriums, ledgers, employees. maybe add a filename field everywhere so you know
 # where to save.
