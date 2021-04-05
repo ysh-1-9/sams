@@ -8,7 +8,7 @@
 from datetime import datetime
 from functools import partial
 from tkinter import *
-from tkcalendar import DateEntry
+from tkcalendar import *
 
 
 class Seat:
@@ -295,7 +295,7 @@ class ManagementSystem:
 
             entry2 = Entry(newframe)
             entry2.place(relx=0.75, rely=0.14, relwidth=0.2, relheight=0.12)
-
+            global starttime, endtime, startdate, enddate
             def getsdt():
                 cal = Calendar(root, selectmode = 'day',
                                           year = 2020, month = 5,
@@ -304,8 +304,10 @@ class ManagementSystem:
                 cal.place(relx = 0.05, rely = 0.43)
 
                 def grad_date():
+                   global startdate
                    c = cal.get_date()
                    print(c)
+                   startdate = c
                    cal.destroy()
 
                    options = ['00:00', '01:00', '02:00', '03:00', '04:00', '05:00', '06:00', '07:00', '08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00', '21:00', '22:00', '23:00']
@@ -318,6 +320,8 @@ class ManagementSystem:
                    def gettime(v, c):
                        v = str(v)
                        print(v)
+                       global startdate
+                       startdate += ' '+c
                        drop.destroy()                       
                        bb.destroy()
                        labelst = Label(newframe, text= (c + " " + v), bg = "#ffd6d6")
@@ -350,7 +354,8 @@ class ManagementSystem:
                    c = cal.get_date()
                    print(c)
                    cal.destroy()
-
+                   global enddate
+                   enddate = c
                    options = ['00:00', '01:00', '02:00', '03:00', '04:00', '05:00', '06:00', '07:00', '08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00', '21:00', '22:00', '23:00']
                    clicked = StringVar()
 
@@ -361,6 +366,8 @@ class ManagementSystem:
                    def gettime(v, c):
                        v = str(v)
                        print(v)
+                       global enddate
+                       enddate += ' '+c
                        drop.destroy()                       
                        bb.destroy()
                        labelst = Label(newframe, text= (c + " " + v), bg = "#ffd6d6")
@@ -407,8 +414,8 @@ class ManagementSystem:
             entry8.place(relx=0.75, rely=0.66, relwidth=0.2, relheight=0.12)
 
             button1 = Button(newframe, text="Create",
-                             command=lambda: self.createshow(newframe, entry1.get(), entry2.get(), entry3.get(),
-                                                             entry4.get(), entry5.get(), entry6.get(), entry7.get(),
+                             command=lambda: self.createshow(newframe, entry1.get(), entry2.get(), startdate,
+                                                             enddate, entry5.get(), entry6.get(), entry7.get(),
                                                              entry8.get()))
             button1.place(relx=0.45, relwidth=0.1, rely=0.86, relheight=0.1)
 
