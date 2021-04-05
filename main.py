@@ -9,7 +9,8 @@ from datetime import datetime
 from functools import partial
 from tkinter import *
 from tkcalendar import *
-
+import csv
+import os.path
 
 class Seat:
     def __init__(self, seatnumber, seattype):
@@ -95,7 +96,9 @@ class SalesPerson(Employee):
     def __init__(self, ID, passw, rate):
         self.transactions = []
         self.commission = 0
-        self.rate = rate
+
+        self.rate =int(rate)
+
         Employee.__init__(self, ID, passw)
         # create file
         # self.df = pd.dataframe("hdkf.csv")
@@ -151,18 +154,123 @@ class ManagementSystem:
 
     def save(self):
         pass
-        #save to employees.csx    format:
 
+        
         #save to ledger.csv            format: ['ID','name','date','price']        name is a string of showname,audino,starttime, and is irrelevant mostly
+        fields = ['ID','name','date','price']
+        
+        transactionFile = "alltransactions.csv"
+        with open(transactionFile,'w',newline='') as csvfile:
+            writer = csv.DictWriter(csvfile,fieldnames=fields)
+            writer.writeheader()
+        
+        '''t1 = Transaction(40,1,"booking",90)
+        t2 = Transaction(40,2,"booking",91)
+        transactionss = {1:t1,2:t2}'''
+        for key,y in self.ledger.transactions.items():
+            data = [y.transactionID,y.name,y.date,y.value]
+            transactionFile = open("alltransactions.csv", 'a+', newline ='')
+            with transactionFile:
+                write = csv.writer(transactionFile)
+                write.writerow(data)    
 
         #save to balancesheet.csv      format: [name, audino, starttime, value]
+        fields = ['name', 'audino', 'starttime', 'value']
+        balSheet = "balanceSheet.csv"
+        with open(balSheet,'w',newline='') as csvfile:
+            writer = csv.DictWriter(csvfile,fieldnames=fields)
+            writer.writeheader()
+
+        for key,y in self.balanceSheet.items():
+            audinum = key.split(' ;')[0]
+            date = key.split(' ;')[1]
+            data = [y[1],audinum,date,y[0]]
+            balSheet = open("balanceSheet.csv", 'a+', newline ='')
+            with balSheet:
+                write = csv.writer(balSheet)
+                write.writerow(data)        
 
         #save to shows.csv    format: [starttime, endtime, audiNum, name, nB, nN, priceB, priceN]
+        fields = ['starttime', 'endtime', 'audiNum', 'name', 'numBalcony', 'numNormal', 'priceB', 'priceN']
+        showsList = "Shows.csv"
+        with open(showsList,'w',newline='') as csvfile:
+            writer = csv.DictWriter(csvfile,fieldnames=fields)
+            writer.writeheader()
 
+        for x in self.auditoriums.shows:
+            data = [x.startTime, x.endTime, x.audino, x.name, len(x.bseats), len(x.nseats), x.priceBalcony, x.priceNormal]
+            showsFile = open("Shows.csv", 'a+', newline ='')
+            with showsFile:
+                write = csv.writer(showsFile)
+                write.writerow(data)
+            fields = ['number','type','transactionId','status']
+            seatFile = x.name+"_"+str(x.audino)+"_"+ x.startTime.strftime("%c")+".csv"
+            seatFile = seatFile.replace(" ","_")
+            seatFile = seatFile.replace(":","_")
+
+            with open(seatFile,'w',newline='') as csvfile:
+                writer = csv.DictWriter(csvfile,fieldnames=fields)
+                writer.writeheader()   
+            for y in x.bseats:
+                data2  = [y.seatNumber,"balcony",y.transactionID,y.allotmentStatus]
+                seatfilee = open(seatFile,'a+',newline='')
+                with seatfilee:
+                    write = csv.writer(seatfilee)
+                    write.writerow(data2) 
+            for y in x.nseats:
+                data2  = [y.seatNumber,"normal",y.transactionID,y.allotmentStatus]
+                seatfilee = open(seatFile,'a+',newline='')
+                with seatfilee:
+                    write = csv.writer(seatfilee)
+                    write.writerow(data2)       
         #save seats for each show to "avengers 3 Mon, Jan 1 2001 00:00".csv
+
+        #save to employees.csx    format:[id, password,commission rate,commission,type,transactionList]
+        fields = ['id', 'password','commission rate','commission','type','transactionList']
+        employeeFile = "employees.csv"
+        with open(employeeFile,'w',newline='') as csvfile:
+            writer = csv.DictWriter(csvfile,fieldnames=fields)
+            writer.writeheader()
+
+        for y in self.employees:
+            data = [y.loginID,y.password]
+            if isinstance(y,ShowManager):
+                data.extend([-1,-1,"showmanager"," "])
+            elif isinstance(y,AuditClerk):
+                 data.extend([-1,-1,"auditclerk"," "])
+            else:
+                data.extend([y.rate,y.commission,"salesperson",y.transactions])     
+                
+            employeeFile = open("employees.csv", 'a+', newline ='')
+            with employeeFile:
+                write = csv.writer(employeeFile)
+                write.writerow(data)   
+
+
 
     '''def read(self, ledgerfile, loginfile, auditoriumfile):  # method not in SRS
         pass  # TBD'''
+    
+    def book(self, seat, show):
+        ID = len(self.ledger.transactions)
+        if seat.seatType == 'Normal':
+            value = show.priceNormal
+        else:
+            value = show.priceBalcony
+        if seat.isAvailable():
+            seat.allot(ID)
+            self.ledger.addExpense(show.name+show.audino+show.startTime.strftime("%c"),value, datetime.now())
+        else:
+            seat.cancel()
+            value*=-1
+            self.ledger.addExpense(show.name+show.audino+show.startTime.strftime("%c"),value, datetime.now())
+
+        self.currentemployee.transactions.append(ID)
+        self.currentemployee.commission += self.currentemployee.rate * value
+        key = str(show.audino) + ' ;'+show.startTime.strftime("%c")
+        self.balanceSheet[key] = [self.balanceSheet.get(key,[0,''])[0]+value,show.name]
+        return [ID, value]
+
 
     def book(self, seat, show):
         ID = len(self.ledger.transactions)
@@ -252,7 +360,7 @@ class ManagementSystem:
                     else:
                         self.ShowManagerMenu(root)
                         return
-
+                      
             print("invalid login")
 
         button1 = Button(frame, text='Login', command=lambda: login(str(entry1.get()), str(entry2.get())))
@@ -358,6 +466,7 @@ class ManagementSystem:
                    enddate = c
                    options = ['00:00', '01:00', '02:00', '03:00', '04:00', '05:00', '06:00', '07:00', '08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00', '21:00', '22:00', '23:00']
                    clicked = StringVar()
+
 
                    clicked.set( "Select Time" )
 
@@ -584,8 +693,9 @@ class ManagementSystem:
 
             for x in spshows:
                 splistbox.insert(splistbox.size() + 1,
-                                 x.name + " ;" + x.audino + " ;" + x.startTime.strftime("%c") + " ;" + x.endTime.strftime(
-                                     "%c"))
+
+                                 x.name + " ;" + str(x.audino) + " ;" + x.startTime.strftime("%c") + " ;" + x.endTime.strftime("%c"))
+
             splistbox.place(relx=0.05, rely=0.05, relheight=0.85, relwidth=0.9)
 
             def spselected_item(event):
@@ -723,6 +833,7 @@ class ManagementSystem:
 
         label2 = Label(frame, text="Enter expense amount: ", bg="#ffd6d6")
         label2.place(relx=0.05, relwidth=0.425, rely=0.43, relheight=0.1)
+
 
         entry2 = Entry(frame)
         entry2.place(relx=0.525, relwidth=0.425, rely=0.43, relheight=0.1)
@@ -876,9 +987,90 @@ def startup():
     sys = ManagementSystem()
     x = ShowManager('id', 'pass')
     y = SalesPerson('id1', 'pass1', 100)
+    '''t1 = Show(datetime.strptime("01/01/01 00:00", '%m/%d/%y %H:%M'),datetime.strptime("01/01/01 02:00", '%m/%d/%y %H:%M'),"1","test1",90,10,250,200)
+    t2 = Show(datetime.strptime("02/01/01 00:00", '%m/%d/%y %H:%M'),datetime.strptime("02/01/01 00:00", '%m/%d/%y %H:%M'),"1","test2",90,10,250,200)
+    sys.auditoriums.addshow(t1)
+    sys.auditoriums.addshow(t2)
     sys.employees.append(x)
-    sys.employees.append(y)
-    sys.homeUI()
+    sys.employees.append(y)'''
+    #read ledger
+    if os.path.isfile('alltransactions.csv'):
+        with open('alltransactions.csv', mode ='r+')as file:
+            csvFile = csv.reader(file)
+            for lines in csvFile:
+                if lines[3] != 'price':
+                    t = Transaction(int(lines[3]),int(lines[0]),lines[1],lines[2])   
+                    sys.ledger.transactions[lines[0]]=t
+    else:
+        print("alltransactions file not found")  
+
+    #read balance sheet
+    if os.path.isfile('balanceSheet.csv'):
+        with open('balancesheet.csv', mode ='r+')as file:
+            csvFile = csv.reader(file)
+            for lines in csvFile: 
+                if lines[3]!= 'value':           
+                    key = str(lines[1]) + ' ;'+lines[2]
+                    sys.balanceSheet[key] =  [int(float(lines[3])),lines[0]]
+    else:
+        print("balancesheet file not found") 
+    #read shows.csv
+    if os.path.isfile('Shows.csv'):
+        with open('Shows.csv', mode ='r+')as file:
+            csvFile = csv.reader(file)
+            for lines in csvFile: 
+                if lines[2]!= 'audiNum':
+                    print(type(lines[0]))   
+                    s= Show(datetime.strptime(lines[0],'%Y-%m-%d %H:%M:%S'),datetime.strptime(lines[1],'%Y-%m-%d %H:%M:%S'),int(lines[2]),lines[3],int(lines[4]),int(lines[5]),int(lines[6]),int(lines[7]))
+                    sys.auditoriums.shows.append(s)
+                    # print("aa")
+                    # print(lines[0])
+                    # print(type(lines[0]))
+                    seatFile = s.name+"_"+str(s.audino)+"_"+ datetime.strptime(lines[0],'%Y-%m-%d %H:%M:%S').strftime("%c")+".csv"
+                    seatFile = seatFile.replace(" ","_")
+                    seatFile = seatFile.replace(":","_")
+                    with open(seatFile, mode ='r+')as file2:
+                        csvFile = csv.reader(file2)
+                        for line in csvFile: 
+                            if line[1] == 'balcony':
+                                x = Seat(int(line[0]),'balcony')
+                                if line[2]=='':
+                                    x.transactionID = None
+                                else:
+                                    x.transactionID = int(line[2])
+                                x.allotmentStatus = line[3]
+                                s.bseats.append(x)
+                            elif line[1] == 'normal':
+                                x = Seat(int(line[0]),'normal')
+                                if line[2]=='':
+                                    x.transactionID = None
+                                else:
+                                    x.transactionID = int(line[2])
+                                x.allotmentStatus = line[3]
+                                s.nseats.append(x)    
+    else:
+        print("shows file not found") 
+
+    #read employees:
+    if os.path.isfile('employees.csv'):
+        with open('employees.csv', mode ='r+')as file:
+            csvFile = csv.reader(file)
+            for lines in csvFile:  
+                   if lines[4] == "showmanager":
+                       ep = ShowManager(lines[0],lines[1])
+                   elif lines[4] == "auditclerk":
+                       ep = AuditClerk(lines[0],lines[1])
+                   elif lines[4] == "salesperson":
+                       ep = SalesPerson(lines[0],lines[1],int(lines[2]))  
+                       ep.commission = int(lines[3])
+                       ep.transactions = lines[5]             
+    else:
+        print("employee file not found")             
+
+    sys.homeUI()          #UNCOMMENT FFS
+    sys.save()
+
+    
 
 
 startup()
