@@ -164,7 +164,10 @@ class ManagementSystem:
     '''def read(self, ledgerfile, loginfile, auditoriumfile):  # method not in SRS
         pass  # TBD'''
 
-    def book(self, seat, show):
+    def book(self, operation,frame, seat, show):
+        Label(frame,
+              text=(operation + " of seat number " + str(seat.seatNumber + 1) + " for show " + show.name + " unsuccessful"),
+              bg="#ffd6d6").place(relx = 0.1, rely = 0.75, relheight=0.2, relwidth=0.8)
         ID = len(self.ledger.transactions)
         if seat.seatType == 'Normal':
             value = show.priceNormal
@@ -182,6 +185,11 @@ class ManagementSystem:
         self.currentemployee.commission += self.currentemployee.rate * value
         key = str(show.audino) + ' ;'+show.startTime.strftime("%c")
         self.balanceSheet[key] = [self.balanceSheet.get(key,[0,''])[0]+value,show.name]
+
+        Label(frame,
+              text=(operation + " of seat number " + str(seat.seatNumber + 1) + " for show " + show.name+" successful"),
+              bg="#ffd6d6").place(relx = 0.1, rely = 0.75, relheight=0.2, relwidth=0.8)
+
         return [ID, value]
 
 
@@ -683,10 +691,16 @@ class ManagementSystem:
                 elif num == 1:
                     seat = show.bseats[seatnumber]
 
-                Label(spframe4, text=("Confirm changes to seat number " + str(seatnumber + 1) + " for show " + show.name),
+                if seat.isAvailable():
+                    operation = "booking"
+                else:
+                    operation = "cancelletion"
+
+
+                Label(spframe4, text=("Confirm "+operation+"of seat number " + str(seatnumber + 1) + " for show " + show.name),
                       bg="#ffd6d6").pack(padx=25, pady=100)
                 spbutton7 = Button(spframe4, text='Confirm Booking', bd=5,
-                                   command=lambda: self.book(seat,show))
+                                   command=lambda: self.book(operation,spframe4, seat,show))
                 spbutton7.place(relx=0.4, rely=0.4, relheight=0.1, relwidth=0.15)
 
             splistbox.bind('<Double-1>', spselected_item)
