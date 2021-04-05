@@ -532,7 +532,7 @@ class ManagementSystem:
 
             listbox = Listbox(newframe)
             for key,value in self.balanceSheet.items():
-                listbox.insert(listbox.size()+1, value[1] + ' ;'+key.split(' ;')[0]+ ' ;'+key.split(' ;')[0]+ ' ;'+value[0])
+                listbox.insert(listbox.size()+1, value[1] + ' ;'+key.split(' ;')[0]+ ' ;'+key.split(' ;')[0]+ ' ;'+str(value[0]))
             # insert things to listbox from self.balancesheet
             listbox.place(relx=0.05, relwidth=0.9, rely=0.2, relheight=0.75)
 
@@ -733,11 +733,58 @@ class ManagementSystem:
         label3 = Label(frame, text="Enter expense date: ", bg="#ffd6d6")
         label3.place(relx=0.05, relwidth=0.425, rely=0.62, relheight=0.1)
 
-        entry3 = Entry(frame)
-        entry3.place(relx=0.525, relwidth=0.425, rely=0.62, relheight=0.1)
+        global startdate
+
+        def getsdt():
+            cal = Calendar(frame, selectmode='day',
+                           year=2020, month=5,
+                           day=22)
+
+            cal.place(relx=0.05, relwidth=0.425, rely=0.62)
+
+            def grad_date():
+                global startdate
+                c = cal.get_date()
+                print(c)
+                startdate = c
+                cal.destroy()
+
+                options = ['00:00', '01:00', '02:00', '03:00', '04:00', '05:00', '06:00', '07:00', '08:00', '09:00',
+                           '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00',
+                           '20:00', '21:00', '22:00', '23:00']
+                clicked = StringVar()
+
+                clicked.set("Select Time")
+
+                etime = ' time not selected'
+
+                def gettime(v, c):
+                    v = str(v)
+                    print(v)
+                    global startdate
+                    startdate += ' ' + c
+                    drop.destroy()
+                    bb.destroy()
+                    labelst = Label(frame, text=(c + " " + v), bg="#ffd6d6")
+                    labelst.place(relx=0.525, relwidth=0.425, rely=0.62, relheight=0.1)
+
+                drop = OptionMenu(root, clicked, *options, command=partial(gettime, c))
+                drop.place(relx=0.525, relwidth=0.425, rely=0.62, relheight=0.1)
+
+            bb = Button(root, text="Done",
+                        command=grad_date)
+            bb.place(relx=0.525, relwidth=0.425, rely=0.62, relheight=0.10)
+
+        buttonst = Button(frame, text="Time:", command=getsdt)
+        buttonst.place(relx=0.05, relwidth=0.425, rely=0.62, relheight=0.1)
+
+        # entry3 = Entry(frame)
+        # entry3.place(relx=0.525, relwidth=0.425, rely=0.62, relheight=0.1)
 
         def save():
-            if self.ledger.addExpense(entry1.get(), entry2.get(), datetime.strptime(entry3.get(), '%m/%d/%y %H:%M')):
+            if self.ledger.addExpense(entry1.get(), entry2.get(), datetime.strptime(startdate, '%m/%d/%y %H:%M')):
+                key = str(-1) + ' ;' + datetime.strptime(startdate, '%m/%d/%y %H:%M').strftime('%c')
+                self.balanceSheet[key] = [self.balanceSheet.get(key, [0, ''])[0] + int(entry2.get()), entry1.get()]
                 label4 = Label(frame, text=entry1.get() + " Saved Successfully", bg="#ffd6d6")
                 label4.place(relx=0.55, relwidth=0.4, rely=0.81, relheight=0.1)
             else:
@@ -879,8 +926,10 @@ def startup():
     sys = ManagementSystem()
     x = ShowManager('id', 'pass')
     y = SalesPerson('id1', 'pass1', 100)
+    z = AuditClerk('id2','pass2')
     sys.employees.append(x)
     sys.employees.append(y)
+    sys.employees.append(z)
     sys.homeUI()
 
 
