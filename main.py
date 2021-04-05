@@ -11,6 +11,7 @@ from tkinter import *
 from tkcalendar import *
 import csv
 import os.path
+
 class Seat:
     def __init__(self, seatnumber, seattype):
         self.seatNumber = seatnumber
@@ -95,7 +96,9 @@ class SalesPerson(Employee):
     def __init__(self, ID, passw, rate):
         self.transactions = []
         self.commission = 0
+
         self.rate =int(rate)
+
         Employee.__init__(self, ID, passw)
         # create file
         # self.df = pd.dataframe("hdkf.csv")
@@ -151,6 +154,7 @@ class ManagementSystem:
 
     def save(self):
         pass
+
         
         #save to ledger.csv            format: ['ID','name','date','price']        name is a string of showname,audino,starttime, and is irrelevant mostly
         fields = ['ID','name','date','price']
@@ -243,6 +247,7 @@ class ManagementSystem:
                 write.writerow(data)   
 
 
+
     '''def read(self, ledgerfile, loginfile, auditoriumfile):  # method not in SRS
         pass  # TBD'''
     
@@ -264,6 +269,26 @@ class ManagementSystem:
         self.currentemployee.commission += self.currentemployee.rate * value
         key = str(show.audino) + ' ;'+show.startTime.strftime("%c")
         self.balanceSheet[key] = [self.balanceSheet.get(key,[0,''])[0]+value,show.name]
+        return [ID, value]
+
+
+    def book(self, seat, show):
+        ID = len(self.ledger.transactions)
+        if seat.seatType == 'Normal':
+            value = show.priceNormal
+        else:
+            value = show.priceBalcony
+        if seat.isAvailable():
+            seat.allot(ID)
+            self.ledger.addExpense(show.name+show.audino+show.startTime.strftime("%c"),value, datetime.now())
+        else:
+            seat.cancel()
+            value*=-1
+            self.ledger.addExpense(show.name+show.audino+show.startTime.strftime("%c"),value, datetime.now())
+
+        self.currentemployee.transactions.append(ID)
+        self.currentemployee.commission += self.currentemployee.rate * value
+
         return [ID, value]
 
 
@@ -335,7 +360,7 @@ class ManagementSystem:
                     else:
                         self.ShowManagerMenu(root)
                         return
-
+                      
             print("invalid login")
 
         button1 = Button(frame, text='Login', command=lambda: login(str(entry1.get()), str(entry2.get())))
@@ -441,6 +466,7 @@ class ManagementSystem:
                    enddate = c
                    options = ['00:00', '01:00', '02:00', '03:00', '04:00', '05:00', '06:00', '07:00', '08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00', '21:00', '22:00', '23:00']
                    clicked = StringVar()
+
 
                    clicked.set( "Select Time" )
 
@@ -667,7 +693,9 @@ class ManagementSystem:
 
             for x in spshows:
                 splistbox.insert(splistbox.size() + 1,
+
                                  x.name + " ;" + str(x.audino) + " ;" + x.startTime.strftime("%c") + " ;" + x.endTime.strftime("%c"))
+
             splistbox.place(relx=0.05, rely=0.05, relheight=0.85, relwidth=0.9)
 
             def spselected_item(event):
@@ -805,6 +833,7 @@ class ManagementSystem:
 
         label2 = Label(frame, text="Enter expense amount: ", bg="#ffd6d6")
         label2.place(relx=0.05, relwidth=0.425, rely=0.43, relheight=0.1)
+
 
         entry2 = Entry(frame)
         entry2.place(relx=0.525, relwidth=0.425, rely=0.43, relheight=0.1)
@@ -1042,6 +1071,7 @@ def startup():
     sys.save()
 
     
+
 
 startup()
 
