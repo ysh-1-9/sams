@@ -180,7 +180,8 @@ class ManagementSystem:
 
         self.currentemployee.transactions.append(ID)
         self.currentemployee.commission += self.currentemployee.rate * value
-
+        key = str(show.audino) + ' ;'+show.startTime.strftime("%c")
+        self.balanceSheet[key] = [self.balanceSheet.get(key,[0,''])[0]+value,show.name]
         return [ID, value]
 
 
@@ -530,6 +531,8 @@ class ManagementSystem:
             button6.place(relx=0.05, relwidth=0.075, rely=0.05, relheight=0.1)
 
             listbox = Listbox(newframe)
+            for key,value in self.balanceSheet.items():
+                listbox.insert(listbox.size()+1, value[1] + ' ;'+key.split(' ;')[0]+ ' ;'+key.split(' ;')[0]+ ' ;'+value[0])
             # insert things to listbox from self.balancesheet
             listbox.place(relx=0.05, relwidth=0.9, rely=0.2, relheight=0.75)
 
